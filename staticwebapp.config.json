@@ -1,0 +1,15 @@
+{
+    "navigationFallback": {
+      "rewrite": "/index.html",
+      "exclude": ["/api/*", "/*.{png,jpg,jpeg,gif,svg,pdf,css,js}"]
+    },
+    "routes": [
+      {
+        "route": "/api/*",
+        "allowedRoles": ["anonymous"]
+      }
+    ],
+    "globalHeaders": {
+      "X-Content-Type-Options": "nosniff"
+    }
+  }
