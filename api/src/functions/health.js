@@ -1,10 +1,13 @@
-module.exports = async function (context, req) {
-    context.res = {
+const { app } = require("@azure/functions");
+
+app.http("health", {
+  route: "health",
+  methods: ["GET"],
+  authLevel: "anonymous",
+  handler: async (request, context) => {
+    return {
       status: 200,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: {
+      jsonBody: {
         ok: true,
         message: "API funcionando",
         hasStorageConnection: Boolean(process.env.AZURE_STORAGE_CONNECTION_STRING),
@@ -12,4 +15,5 @@ module.exports = async function (context, req) {
         tableName: process.env.RESULTADOS_TABLE || null
       }
     };
-  };
+  }
+});

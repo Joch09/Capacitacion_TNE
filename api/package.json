@@ -2,12 +2,12 @@
   "name": "capacitacion-tne-api",
   "version": "1.0.0",
   "description": "API para guardar resultados de capacitación TNE",
-  "main": "index.js",
+  "main": "src/functions/*.js",
   "engines": {
     "node": "20.x"
   },
   "dependencies": {
-    "@azure/data-tables": "^13.3.0",
-    "uuid": "^9.0.1"
+    "@azure/functions": "^4.0.0",
+    "@azure/data-tables": "^13.3.0"
   }
 }
