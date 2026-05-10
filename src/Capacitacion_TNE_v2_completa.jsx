@@ -1222,7 +1222,7 @@ function MultiSelectReview({ review, state, onToggle, onGrade }) {
   );
 }
 
-function TrueFalseReview({ review, state, onSelect, onGrade }) {
+function TrueFalseReview({ review, state, onSelect, onGrade, isMobile = false }) {
   const checked = !!state.checked;
   const answers = state.answers || {};
   const completed = review.items.every((_, idx) => typeof answers[idx] === "boolean");
@@ -1669,7 +1669,7 @@ export default function App() {
         setReviewState({ ...reviewState, [currentModule.id]: { ...currentReviewState, selected } });
       }} onGrade={() => setReviewState({ ...reviewState, [currentModule.id]: { ...currentReviewState, checked: true } })} />;
     }
-    return <TrueFalseReview review={currentReview} state={currentReviewState} onSelect={(itemIndex, value) => {
+    return <TrueFalseReview review={currentReview} state={currentReviewState} isMobile={isMobile} onSelect={(itemIndex, value) => {
       if (currentReviewState.checked) return;
       setReviewState({ ...reviewState, [currentModule.id]: { ...currentReviewState, answers: { ...currentReviewState.answers, [itemIndex]: value } } });
     }} onGrade={() => setReviewState({ ...reviewState, [currentModule.id]: { ...currentReviewState, checked: true } })} />;
