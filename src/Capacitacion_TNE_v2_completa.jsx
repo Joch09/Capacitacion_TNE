@@ -2,6 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 
 // Estilos globales de animación CSS
 const GLOBAL_STYLE = `
+  * { box-sizing: border-box; }
+  html, body, #root { max-width: 100%; overflow-x: hidden; }
+  img { max-width: 100%; height: auto; }
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
@@ -1081,26 +1084,64 @@ function Button({ children, onClick, variant = "primary", disabled = false, styl
   );
 }
 
-function InstitutionalHeader() {
+
+function useViewport() {
+  const [width, setWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const onResize = () => setWidth(window.innerWidth);
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  return {
+    width,
+    isMobile: width < 768,
+    isTablet: width < 1024,
+  };
+}
+
+function InstitutionalHeader({ isMobile = false }) {
   return (
-    <div style={{ background: COLORS.fondo, padding: "20px 40px", borderBottom: `2px solid ${COLORS.guinda}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-      <img src={LOGO_SRC} alt="Servicios de Salud IMSS-BIENESTAR" style={{ height: 50, objectFit: "contain" }} />
-      <div style={{ textAlign: "right" }}>
-        <div style={{ fontSize: 28, fontWeight: 900, color: COLORS.guinda }}>SVEDSTNE</div>
-        <div style={{ fontSize: 12, fontWeight: "bold", color: COLORS.texto }}>Vigilancia Epidemiológica de Daños a la Salud<br />por Temperaturas Naturales Extremas</div>
+    <div
+      style={{
+        background: COLORS.fondo,
+        padding: isMobile ? "16px 14px" : "20px 40px",
+        borderBottom: `2px solid ${COLORS.guinda}`,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: isMobile ? "flex-start" : "center",
+        gap: isMobile ? 12 : 20,
+        flexDirection: isMobile ? "column" : "row"
+      }}
+    >
+      <img
+        src={LOGO_SRC}
+        alt="Servicios de Salud IMSS-BIENESTAR"
+        style={{ height: isMobile ? 38 : 50, objectFit: "contain", alignSelf: isMobile ? "flex-start" : "auto" }}
+      />
+      <div style={{ textAlign: isMobile ? "left" : "right", width: isMobile ? "100%" : "auto" }}>
+        <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 900, color: COLORS.guinda, lineHeight: 1.1 }}>SVEDSTNE</div>
+        <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: "bold", color: COLORS.texto, lineHeight: 1.45 }}>
+          Vigilancia Epidemiológica de Daños a la Salud<br />por Temperaturas Naturales Extremas
+        </div>
       </div>
     </div>
   );
 }
 
-function ScoreRing({ percent }) {
+function ScoreRing({ percent, isMobile = false }) {
+  const outer = isMobile ? 180 : 220;
+  const inner = isMobile ? 138 : 170;
   return (
-    <div style={{ width: 220, height: 220, borderRadius: 999, margin: "0 auto", background: `conic-gradient(${COLORS.verde} 0 ${percent}%, #E8E1D6 ${percent}% 100%)`, display: "grid", placeItems: "center" }}>
-      <div style={{ width: 170, height: 170, borderRadius: 999, background: "white", display: "grid", placeItems: "center", textAlign: "center", border: `2px solid ${COLORS.beige}` }}>
+    <div style={{ width: outer, height: outer, borderRadius: 999, margin: "0 auto", background: `conic-gradient(${COLORS.verde} 0 ${percent}%, #E8E1D6 ${percent}% 100%)`, display: "grid", placeItems: "center" }}>
+      <div style={{ width: inner, height: inner, borderRadius: 999, background: "white", display: "grid", placeItems: "center", textAlign: "center", border: `2px solid ${COLORS.beige}` }}>
         <div>
-          <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: "0.16em", textTransform: "uppercase", color: COLORS.grisOscuro }}>Calificación</div>
-          <div style={{ fontSize: 54, lineHeight: 1, fontWeight: 900, color: COLORS.verde }}>{percent}%</div>
-          <div style={{ fontSize: 16, color: COLORS.verdeOscuro, fontWeight: 800 }}>{percent >= 80 ? "Excelente" : percent >= 70 ? "Satisfactorio" : "Requiere Repaso"}</div>
+          <div style={{ fontSize: isMobile ? 10 : 12, fontWeight: 900, letterSpacing: "0.16em", textTransform: "uppercase", color: COLORS.grisOscuro }}>Calificación</div>
+          <div style={{ fontSize: isMobile ? 42 : 54, lineHeight: 1, fontWeight: 900, color: COLORS.verde }}>{percent}%</div>
+          <div style={{ fontSize: isMobile ? 14 : 16, color: COLORS.verdeOscuro, fontWeight: 800 }}>{percent >= 80 ? "Excelente" : percent >= 70 ? "Satisfactorio" : "Requiere Repaso"}</div>
         </div>
       </div>
     </div>
@@ -1194,7 +1235,7 @@ function TrueFalseReview({ review, state, onSelect, onGrade }) {
         {review.items.map((item, itemIndex) => (
           <div key={item.text} style={{ borderRadius: 8, border: `1px solid ${COLORS.grisOscuro}`, background: "white", padding: 14 }}>
             <div style={{ marginBottom: 10, fontSize: 14, lineHeight: 1.7, fontWeight: 700, color: COLORS.grisOscuro }}>{item.text}</div>
-            <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(2,minmax(0,1fr))" }}>
+            <div style={{ display: "grid", gap: 10, gridTemplateColumns: isMobile ? "1fr" : "repeat(2,minmax(0,1fr))" }}>
               {item.options.map((option) => {
                 const isSelected = answers[itemIndex] === option.value;
                 let background = "white";
@@ -1301,12 +1342,12 @@ function ContextualVisual({ type }) {
     );
 }
 
-function SectionContent({ type, currentTopic }) {
+function SectionContent({ type, currentTopic, isMobile = false }) {
     const visual = <ContextualVisual type={type} />;
 
     if(['climate_impact', 'cycle_diagram', 'document_pile', 'arrows_loop_improvement', 'mexico_map_viz'].includes(type)) {
         return (
-            <div style={{ display: "grid", gap: 30, gridTemplateColumns: "1fr 280px", alignItems: "start" }}>
+            <div style={{ display: "grid", gap: 30, gridTemplateColumns: isMobile ? "1fr" : "1fr 280px", alignItems: "start" }}>
                 <div style={{ display: "grid", gap: 20 }}>
                     {currentTopic.sections.map((sec, i) => (
                         <div key={i}>
@@ -1323,7 +1364,7 @@ function SectionContent({ type, currentTopic }) {
     if(type === 'health_impact_grid') {
         const sections = currentTopic.sections;
         return (
-            <div style={{ display: "grid", gap: 30, gridTemplateColumns: "1fr 280px", alignItems: "start" }}>
+            <div style={{ display: "grid", gap: 30, gridTemplateColumns: isMobile ? "1fr" : "1fr 280px", alignItems: "start" }}>
                  <div style={{ display: "grid", gap: 20 }}>
                     <div style={baseCardStyle({ padding: 15, background: `${COLORS.beige}20` })}>
                         <h4 style={{ color: COLORS.guindaClaro, fontSize: 18, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>🌡️ {sections[0].heading}</h4>
@@ -1345,7 +1386,7 @@ function SectionContent({ type, currentTopic }) {
 
     if(type === 'speaker_retro' || type === 'collaboration_handshake' || type === 'hierarchy_roles' || type === 'purpose_infographic') {
         return (
-            <div style={{ display: "grid", gap: 30, gridTemplateColumns: "280px 1fr", alignItems: "start" }}>
+            <div style={{ display: "grid", gap: 30, gridTemplateColumns: isMobile ? "1fr" : "280px 1fr", alignItems: "start" }}>
                 {visual}
                 <div style={{ display: "grid", gap: 20 }}>
                     {currentTopic.sections.map((sec, i) => (
@@ -1362,7 +1403,7 @@ function SectionContent({ type, currentTopic }) {
     if(type === 'heat_cold_icons') {
         const sections = currentTopic.sections;
         return (
-            <div style={{ display: "grid", gap: 20, gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
+            <div style={{ display: "grid", gap: 20, gridTemplateColumns: isMobile ? "1fr" : "repeat(3, minmax(0, 1fr))" }}>
                 <div style={baseCardStyle({ padding: 20, background: `${COLORS.error}20` })}>
                     <h4 style={{ color: COLORS.guinda, fontSize: 18, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>🔥 {sections[0].heading}</h4>
                     <p style={{ fontSize: 15, lineHeight: 1.8, color: COLORS.grisOscuro }}>{sections[0].text}</p>
@@ -1399,7 +1440,7 @@ function SectionContent({ type, currentTopic }) {
     if(type === 'process_checklist') {
         return (
             <div>
-                <div style={{ display: "grid", gap: 20, gridTemplateColumns: "repeat(2, minmax(0, 1fr))", marginBottom: 30 }}>
+                <div style={{ display: "grid", gap: 20, gridTemplateColumns: isMobile ? "1fr" : "repeat(2, minmax(0, 1fr))", marginBottom: 30 }}>
                     <div style={baseCardStyle({ padding: 20, borderLeft: `4px solid ${COLORS.guinda}`})}>
                         <h4 style={{ color: COLORS.guinda, fontSize: 18, marginBottom: 10 }}>{currentTopic.sections[0].heading}</h4>
                         <p style={{ fontSize: 15, lineHeight: 1.8, color: COLORS.grisOscuro }}>{currentTopic.sections[0].text}</p>
@@ -1409,7 +1450,7 @@ function SectionContent({ type, currentTopic }) {
                         <p style={{ fontSize: 15, lineHeight: 1.8, color: COLORS.grisOscuro }}>{currentTopic.sections[1].text}</p>
                     </div>
                 </div>
-                <div style={{ display: "grid", gap: 30, gridTemplateColumns: "1fr 280px", alignItems: "start" }}>
+                <div style={{ display: "grid", gap: 30, gridTemplateColumns: isMobile ? "1fr" : "1fr 280px", alignItems: "start" }}>
                     <div>
                         <h4 style={{ color: COLORS.guindaClaro, fontSize: 18, marginBottom: 10 }}>{currentTopic.sections[2].heading}</h4>
                         <p style={{ fontSize: 16, lineHeight: 1.8, color: COLORS.grisOscuro }}>{currentTopic.sections[2].text}</p>
@@ -1437,6 +1478,7 @@ function SectionContent({ type, currentTopic }) {
 
 export default function App() {
   const initialized = useMemo(() => initializeReviewData(), []);
+  const { isMobile, isTablet } = useViewport();
   const [screen, setScreen] = useState("welcome");
   const [participant, setParticipant] = useState({ nombre: "", apellido: "", coordinacion: "", cargo: "" });
   const [diagnosticAnswers, setDiagnosticAnswers] = useState({});
@@ -1637,7 +1679,7 @@ export default function App() {
     <div style={{ minHeight: "100vh", background: COLORS.fondo, fontFamily: "Inter, Noto Sans, Arial, sans-serif" }}>
       <style>{GLOBAL_STYLE}</style>
 
-      <InstitutionalHeader />
+      <InstitutionalHeader isMobile={isMobile} />
 
 
       {screen !== "admin" && (
@@ -1665,21 +1707,21 @@ export default function App() {
         </button>
       )}
 
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 20px" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: isMobile ? "20px 12px" : "40px 20px" }}>
         {screen === "welcome" && (
-          <div style={{ maxWidth: 800, margin: "0 auto", ...baseCardStyle({ padding: 40 }) }} className="animate-content">
-            <h1 style={{ color: COLORS.guinda, fontSize: 32, fontWeight: 900, marginBottom: 10 }}>{welcomeText.title}</h1>
-            <h2 style={{ color: COLORS.verdeOscuro, fontSize: 18, marginBottom: 30 }}>{welcomeText.subtitle}</h2>
-            {welcomeText.paragraphs.map((p, i) => <p key={i} style={{ fontSize: 16, lineHeight: 1.8, color: COLORS.texto, marginBottom: 20 }}>{p}</p>)}
-            <div style={{ marginTop: 40, textAlign: "right" }}>
-              <Button onClick={() => setScreen("register")}>Siguiente: Registro</Button>
+          <div style={{ maxWidth: 800, margin: "0 auto", width: "100%", ...baseCardStyle({ padding: isMobile ? 22 : 40 }) }} className="animate-content">
+            <h1 style={{ color: COLORS.guinda, fontSize: isMobile ? 26 : 32, fontWeight: 900, marginBottom: 10, lineHeight: 1.15 }}>{welcomeText.title}</h1>
+            <h2 style={{ color: COLORS.verdeOscuro, fontSize: isMobile ? 16 : 18, marginBottom: isMobile ? 20 : 30, lineHeight: 1.4 }}>{welcomeText.subtitle}</h2>
+            {welcomeText.paragraphs.map((p, i) => <p key={i} style={{ fontSize: isMobile ? 15 : 16, lineHeight: 1.8, color: COLORS.texto, marginBottom: 20 }}>{p}</p>)}
+            <div style={{ marginTop: 30, textAlign: isMobile ? "stretch" : "right" }}>
+              <Button onClick={() => setScreen("register")} style={isMobile ? { width: "100%" } : {}}>Siguiente: Registro</Button>
             </div>
           </div>
         )}
 
         {screen === "register" && (
-          <div style={{ maxWidth: 600, margin: "0 auto", ...baseCardStyle({ padding: 40 }) }} className="animate-content">
-            <h2 style={{ color: COLORS.guinda, fontSize: 24, fontWeight: 900, marginBottom: 30 }}>Registro de participante</h2>
+          <div style={{ maxWidth: 600, margin: "0 auto", width: "100%", ...baseCardStyle({ padding: isMobile ? 22 : 40 }) }} className="animate-content">
+            <h2 style={{ color: COLORS.guinda, fontSize: isMobile ? 22 : 24, fontWeight: 900, marginBottom: 24, lineHeight: 1.2 }}>Registro de participante</h2>
             <div style={{ display: "grid", gap: 20 }}>
               <div>
                 <label style={{ display: "block", marginBottom: 8, fontSize: 14, fontWeight: "bold", color: COLORS.verdeOscuro }}>Nombre(s)</label>
@@ -1698,17 +1740,17 @@ export default function App() {
                 <input value={participant.cargo} onChange={(e) => setParticipant({...participant, cargo: e.target.value})} style={{ width: "100%", padding: 12, borderRadius: 8, border: `1px solid ${COLORS.gris}` }} />
               </div>
             </div>
-            <div style={{ marginTop: 40, display: "flex", justifyContent: "space-between" }}>
-              <Button variant="secondary" onClick={() => setScreen("welcome")}>Atrás</Button>
-              <Button disabled={!participant.nombre || !participant.apellido || !participant.coordinacion || !participant.cargo} onClick={() => setScreen("diagnostic")}>Iniciar evaluación diagnóstica</Button>
+            <div style={{ marginTop: 30, display: "flex", justifyContent: "space-between", flexDirection: isMobile ? "column" : "row", gap: 12 }}> 
+              <Button variant="secondary" onClick={() => setScreen("welcome")} style={isMobile ? { width: "100%" } : {}}>Atrás</Button>
+              <Button disabled={!participant.nombre || !participant.apellido || !participant.coordinacion || !participant.cargo} onClick={() => setScreen("diagnostic")} style={isMobile ? { width: "100%" } : {}}>Iniciar evaluación diagnóstica</Button>
             </div>
           </div>
         )}
 
         {screen === "diagnostic" && (
-          <div style={{ maxWidth: 800, margin: "0 auto" }}>
-            <h2 style={{ color: COLORS.guinda, fontSize: 28, fontWeight: 900, marginBottom: 20 }}>Evaluación diagnóstica</h2>
-            <p style={{ fontSize: 16, lineHeight: 1.8, color: COLORS.grisOscuro, marginBottom: 30 }}>Responde las siguientes preguntas para evaluar tus conocimientos previos. No te preocupes por la calificación en esta etapa.</p>
+          <div style={{ maxWidth: 800, margin: "0 auto", width: "100%" }}>
+            <h2 style={{ color: COLORS.guinda, fontSize: isMobile ? 24 : 28, fontWeight: 900, marginBottom: 16, lineHeight: 1.2 }}>Evaluación diagnóstica</h2>
+            <p style={{ fontSize: isMobile ? 15 : 16, lineHeight: 1.8, color: COLORS.grisOscuro, marginBottom: 24 }}>Responde las siguientes preguntas para evaluar tus conocimientos previos. No te preocupes por la calificación en esta etapa.</p>
             <div style={{ display: "grid", gap: 20 }}>
               {diagnosticQuestions.map((q, i) => (
                 <QuestionCard 
@@ -1722,13 +1764,13 @@ export default function App() {
                 />
               ))}
             </div>
-            <div style={{ marginTop: 40, padding: 20, background: "white", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }} className="animate-content">
+            <div style={{ marginTop: 28, padding: isMobile ? 16 : 20, background: "white", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "center", flexDirection: isMobile ? "column" : "row", gap: 12 }} className="animate-content">
               {!diagnosticLocked ? (
-                <Button disabled={!diagnosticComplete} onClick={() => setDiagnosticLocked(true)}>Calificar diagnóstico</Button>
+                <Button disabled={!diagnosticComplete} onClick={() => setDiagnosticLocked(true)} style={isMobile ? { width: "100%" } : {}}>Calificar diagnóstico</Button>
               ) : (
                 <>
                   <div style={{ fontSize: 16, fontWeight: "bold", color: COLORS.verdeOscuro }}>Tu puntuación: {diagnosticScore} / {diagnosticQuestions.length}</div>
-                  <Button onClick={() => setScreen("route")}>Ir a Módulos de Capacitación</Button>
+                  <Button onClick={() => setScreen("route")} style={isMobile ? { width: "100%" } : {}}>Ir a Módulos de Capacitación</Button>
                 </>
               )}
             </div>
@@ -1737,13 +1779,13 @@ export default function App() {
 
         {screen === "route" && (
           <div>
-            <h1 style={{ color: COLORS.guinda, fontSize: 32, fontWeight: 900, marginBottom: 10 }}>Módulos de Capacitación</h1>
+            <h1 style={{ color: COLORS.guinda, fontSize: isMobile ? 26 : 32, fontWeight: 900, marginBottom: 10, lineHeight: 1.2 }}>Módulos de Capacitación</h1>
             <p style={{ fontSize: 14, color: COLORS.verdeOscuro, marginBottom: 30, maxWidth: 800 }}>
               El curso es autoguiado. Encontrarás contenido que representa la base para el seguimiento oportuno de riesgos en poblaciones vulnerables por temperaturas naturales extremas.
             </p>
             
-            <div style={{ display: "flex", gap: 30, alignItems: "flex-start", flexWrap: "wrap" }} className="animate-content">
-              <div style={{ flex: "1 1 60%", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+            <div style={{ display: "flex", gap: isMobile ? 20 : 30, alignItems: "flex-start", flexWrap: "wrap", flexDirection: isMobile ? "column" : "row" }} className="animate-content">
+              <div style={{ flex: "1 1 60%", width: isMobile ? "100%" : "auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
                 {modules.map((module, idx) => {
                   const icon = module.icon || "📘";
 
@@ -1761,7 +1803,7 @@ export default function App() {
                       <div style={{ textAlign: "center" }}>
                         <Button 
                           onClick={() => { setCurrentModuleIndex(idx); setCurrentTopicIndex(0); setScreen("module"); }}
-                          style={{ background: COLORS.verde, width: "160px", padding: "10px", fontSize: 13 }}
+                          style={{ background: COLORS.verde, width: isMobile ? "100%" : "160px", padding: "10px", fontSize: 13 }}
                         >
                           Ver Módulo
                         </Button>
@@ -1771,7 +1813,7 @@ export default function App() {
                 })}
               </div>
 
-              <div style={{ flex: "0 0 300px", background: COLORS.fondo, position: "sticky", top: 20 }}>
+              <div style={{ flex: "0 0 300px", width: isMobile ? "100%" : 300, background: COLORS.fondo, position: isMobile ? "static" : "sticky", top: 20 }}>
                 <h3 style={{ margin: "0 0 15px", fontSize: 18, color: COLORS.verdeOscuro, fontWeight: 900 }}>Mi Progreso</h3>
                 <div style={{ display: "flex", gap: 15, marginBottom: 20 }}>
                   <div style={{ width: 6, background: COLORS.guinda, borderRadius: 3 }}></div>
@@ -1801,15 +1843,15 @@ export default function App() {
         )}
 
         {screen === "module" && currentModule && currentTopic && (
-          <div style={{ maxWidth: 900, margin: "0 auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }} className="animate-content">
+          <div style={{ maxWidth: 900, margin: "0 auto", width: "100%" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "center", marginBottom: 20, flexDirection: isMobile ? "column" : "row", gap: 12 }} className="animate-content">
               <Tag bg={COLORS.guindaClaro} color="white">Módulo {currentModule.number}</Tag>
-              <Button variant="secondary" onClick={() => setScreen("route")}>Volver a Módulos</Button>
+              <Button variant="secondary" onClick={() => setScreen("route")} style={isMobile ? { width: "100%" } : {}}>Volver a Módulos</Button>
             </div>
-            <h2 style={{ color: COLORS.guinda, fontSize: 32, fontWeight: 900, marginBottom: 10 }} className="animate-content">{currentModule.title}</h2>
+            <h2 style={{ color: COLORS.guinda, fontSize: isMobile ? 26 : 32, fontWeight: 900, marginBottom: 10, lineHeight: 1.2 }} className="animate-content">{currentModule.title}</h2>
             
-            <div style={baseCardStyle({ padding: 30, marginTop: 20 })} className="animate-content">
-              <h3 style={{ color: COLORS.verdeOscuro, fontSize: 24, fontWeight: 900, marginBottom: 15 }}>{currentTopic.title}</h3>
+            <div style={baseCardStyle({ padding: isMobile ? 18 : 30, marginTop: 20 })} className="animate-content">
+              <h3 style={{ color: COLORS.verdeOscuro, fontSize: isMobile ? 20 : 24, fontWeight: 900, marginBottom: 15, lineHeight: 1.3 }}>{currentTopic.title}</h3>
               
               {currentTopic.objective && (
                 <div style={{ background: COLORS.beige, padding: 15, borderRadius: 8, marginBottom: 30, borderLeft: `2px solid ${COLORS.guindaClaro}` }}>
@@ -1817,21 +1859,21 @@ export default function App() {
                 </div>
               )}
 
-              <SectionContent type={currentTopic.visualType} currentTopic={currentTopic} />
+              <SectionContent type={currentTopic.visualType} currentTopic={currentTopic} isMobile={isMobile} />
             </div>
 
             {currentTopicIndex === currentModule.topics.length - 1 && renderReview()}
 
-            <div style={{ marginTop: 40, display: "flex", justifyContent: "space-between" }} className="animate-content">
-              <Button variant="secondary" onClick={goToPreviousTopic}>Atrás</Button>
-              <Button onClick={goToNextTopic}>{currentTopicIndex === currentModule.topics.length - 1 && currentModuleIndex === modules.length - 1 ? "Ir a Evaluación Final" : "Siguiente"}</Button>
+            <div style={{ marginTop: 30, display: "flex", justifyContent: "space-between", flexDirection: isMobile ? "column" : "row", gap: 12 }} className="animate-content">
+              <Button variant="secondary" onClick={goToPreviousTopic} style={isMobile ? { width: "100%" } : {}}>Atrás</Button>
+              <Button onClick={goToNextTopic} style={isMobile ? { width: "100%" } : {}}>{currentTopicIndex === currentModule.topics.length - 1 && currentModuleIndex === modules.length - 1 ? "Ir a Evaluación Final" : "Siguiente"}</Button>
             </div>
           </div>
         )}
 
         {screen === "final" && (
-          <div style={{ maxWidth: 800, margin: "0 auto" }}>
-            <h2 style={{ color: COLORS.guinda, fontSize: 28, fontWeight: 900, marginBottom: 20 }}>Evaluación Final</h2>
+          <div style={{ maxWidth: 800, margin: "0 auto", width: "100%" }}>
+            <h2 style={{ color: COLORS.guinda, fontSize: isMobile ? 24 : 28, fontWeight: 900, marginBottom: 16 }}>Evaluación Final</h2>
             <p style={{ fontSize: 16, lineHeight: 1.8, color: COLORS.grisOscuro, marginBottom: 30 }}>Responde las preguntas para concluir la capacitación y guardar tus resultados.</p>
             <div style={{ display: "grid", gap: 20 }}>
               {finalQuestions.map((q, i) => (
@@ -1846,17 +1888,17 @@ export default function App() {
                 />
               ))}
             </div>
-            <div style={{ marginTop: 40, padding: 20, background: "white", borderRadius: 8, display: "flex", justifyContent: "flex-end" }} className="animate-content">
-              <Button disabled={!finalComplete || finalLocked} onClick={() => { setFinalLocked(true); setScreen("result"); }}>Finalizar Curso</Button>
+            <div style={{ marginTop: 28, padding: 16, background: "white", borderRadius: 8, display: "flex", justifyContent: isMobile ? "stretch" : "flex-end" }} className="animate-content">
+              <Button disabled={!finalComplete || finalLocked} onClick={() => { setFinalLocked(true); setScreen("result"); }} style={isMobile ? { width: "100%" } : {}}>Finalizar Curso</Button>
             </div>
           </div>
         )}
 
         {screen === "result" && (
-          <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center", ...baseCardStyle({ padding: 50 }) }} className="animate-content">
-            <h2 style={{ color: COLORS.guinda, fontSize: 32, fontWeight: 900, marginBottom: 30 }}>Resultado de tu Evaluación</h2>
-            <ScoreRing percent={finalPercent} />
-            <p style={{ fontSize: 18, marginTop: 30, color: COLORS.texto }}>
+          <div style={{ maxWidth: 600, margin: "0 auto", width: "100%", textAlign: "center", ...baseCardStyle({ padding: isMobile ? 24 : 50 }) }} className="animate-content">
+            <h2 style={{ color: COLORS.guinda, fontSize: isMobile ? 24 : 32, fontWeight: 900, marginBottom: 24, lineHeight: 1.2 }}>Resultado de tu Evaluación</h2>
+            <ScoreRing percent={finalPercent} isMobile={isMobile} />
+            <p style={{ fontSize: isMobile ? 16 : 18, marginTop: 24, color: COLORS.texto, lineHeight: 1.7 }}>
               Obtuviste {finalScore} de {finalQuestions.length} respuestas correctas.
             </p>
             {saveError && (
@@ -1865,7 +1907,7 @@ export default function App() {
               </p>
             )}
             <div style={{ marginTop: 40 }}>
-              <Button
+              <Button style={isMobile ? { width: "100%" } : {}}
                 disabled={savingRecord}
                 onClick={async () => {
                   await saveRecordIfNeeded();
@@ -1879,18 +1921,18 @@ export default function App() {
         )}
 
         {screen === "closing" && (
-          <div style={{ maxWidth: 800, margin: "0 auto", ...baseCardStyle({ padding: 40 }) }} className="animate-content">
+          <div style={{ maxWidth: 800, margin: "0 auto", width: "100%", ...baseCardStyle({ padding: isMobile ? 22 : 40 }) }} className="animate-content">
             <h1 style={{ color: COLORS.guinda, fontSize: 32, fontWeight: 900, marginBottom: 20 }}>{closingText.title}</h1>
             {closingText.paragraphs.map((p, i) => <p key={i} style={{ fontSize: 16, lineHeight: 1.8, color: COLORS.texto, marginBottom: 20 }}>{p}</p>)}
-            <div style={{ marginTop: 40, textAlign: "right" }}>
-              <Button onClick={() => setScreen("readings")}>Ver Lecturas Recomendadas</Button>
+            <div style={{ marginTop: 30, textAlign: isMobile ? "stretch" : "right" }}>
+              <Button style={isMobile ? { width: "100%" } : {}} onClick={() => setScreen("readings")}>Ver Lecturas Recomendadas</Button>
             </div>
           </div>
         )}
 
         {screen === "readings" && (
-          <div style={{ maxWidth: 800, margin: "0 auto" }}>
-            <h2 style={{ color: COLORS.guinda, fontSize: 28, fontWeight: 900, marginBottom: 20 }}>Lecturas Recomendadas</h2>
+          <div style={{ maxWidth: 800, margin: "0 auto", width: "100%" }}>
+            <h2 style={{ color: COLORS.guinda, fontSize: isMobile ? 24 : 28, fontWeight: 900, marginBottom: 20 }}>Lecturas Recomendadas</h2>
             <div style={{ display: "grid", gap: 20 }} className="animate-content">
               {recommendedReadings.map((r, i) => (
                 <div key={i} style={baseCardStyle({ padding: 20 })}>
@@ -1903,7 +1945,7 @@ export default function App() {
             </div>
             
             <div style={{ marginTop: 40, textAlign: "center", display: "flex", flexDirection: "column", gap: 20, alignItems: "center" }} className="animate-content">
-              <Button variant="secondary" onClick={() => setScreen("welcome")}>Volver al Inicio</Button>
+              <Button variant="secondary" onClick={() => setScreen("welcome")} style={isMobile ? { width: "100%" } : {}}>Volver al Inicio</Button>
               <button onClick={() => setAdminOpen(true)} style={{ background: "transparent", border: 0, color: COLORS.grisOscuro, fontSize: 12, fontWeight: 900, letterSpacing: "0.16em", textTransform: "uppercase", textDecoration: "underline", cursor: "pointer", marginTop: 20 }}>
                 Acceso administrativo
               </button>
@@ -1912,7 +1954,7 @@ export default function App() {
         )}
 
         {screen === "admin" && adminUnlocked && (
-          <div style={{ maxWidth: 1100, margin: "0 auto", ...baseCardStyle({ padding: 40 }) }} className="animate-content">
+          <div style={{ maxWidth: 1100, margin: "0 auto", width: "100%", ...baseCardStyle({ padding: isMobile ? 18 : 40 }) }} className="animate-content">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 30 }}>
               <div>
                 <h2 style={{ color: COLORS.guinda, fontSize: 28, fontWeight: 900, margin: 0 }}>Panel Administrativo</h2>
@@ -1921,11 +1963,11 @@ export default function App() {
                 </p>
               </div>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "flex-end" }}>
-                <Button variant="secondary" onClick={() => loadRecordsFromServer()} disabled={recordsLoading}>
+                <Button variant="secondary" onClick={() => loadRecordsFromServer()} disabled={recordsLoading} style={isMobile ? { width: "100%" } : {}}>
                   {recordsLoading ? "Actualizando..." : "Actualizar"}
                 </Button>
-                <Button onClick={() => window.open(RESULTS_CSV_PATH, "_blank")}>Descargar CSV</Button>
-                <Button variant="secondary" onClick={() => setScreen("welcome")}>Salir del Panel</Button>
+                <Button onClick={() => window.open(RESULTS_CSV_PATH, "_blank")} style={isMobile ? { width: "100%" } : {}}>Descargar CSV</Button>
+                <Button variant="secondary" onClick={() => setScreen("welcome")} style={isMobile ? { width: "100%" } : {}}>Salir del Panel</Button>
               </div>
             </div>
 
