@@ -29,6 +29,8 @@ const COLORS = {
 
 const STORAGE_KEY = "capacitacion_tne_v3_resultados";
 const ADMIN_CODE = "IMSSB-TNE-2026";
+const RESULTS_API_PATH = "/api/resultados";
+const RESULTS_CSV_PATH = "/api/resultados-csv";
 
 const MANUAL_PATH = "/34_Manual_Temp_Nats_Extremas.pdf";
 const LOGO_SRC = "data:image/png;base64,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";
@@ -1446,18 +1448,17 @@ export default function App() {
   const [finalAnswers, setFinalAnswers] = useState({});
   const [finalLocked, setFinalLocked] = useState(false);
   const [records, setRecords] = useState([]);
+  const [recordsLoading, setRecordsLoading] = useState(false);
+  const [recordsError, setRecordsError] = useState("");
   const [savedRecordId, setSavedRecordId] = useState(null);
+  const [savingRecord, setSavingRecord] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [adminOpen, setAdminOpen] = useState(false);
   const [adminUnlocked, setAdminUnlocked] = useState(false);
   const [adminCode, setAdminCode] = useState("");
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) setRecords(JSON.parse(raw));
-    } catch {
-      setRecords([]);
-    }
+    loadRecordsFromServer();
   }, []);
 
   const currentModule = modules[currentModuleIndex];
@@ -1472,26 +1473,116 @@ export default function App() {
   const finalComplete = Object.keys(finalAnswers).length === finalQuestions.length;
   const finalPercent = Math.round((finalScore / finalQuestions.length) * 100) || 0;
 
-  function saveRecordIfNeeded() {
-    if (savedRecordId) return;
+  async function loadRecordsFromServer() {
+    setRecordsLoading(true);
+    setRecordsError("");
+
+    try {
+      const response = await fetch(RESULTS_API_PATH, { cache: "no-store" });
+
+      if (!response.ok) {
+        throw new Error("No se pudieron cargar los resultados del servidor.");
+      }
+
+      const data = await response.json();
+      const normalized = Array.isArray(data) ? data : [];
+      setRecords(normalized);
+
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+      } catch {
+        // El respaldo local es opcional; si falla, la consulta en Azure sigue siendo la fuente principal.
+      }
+    } catch (error) {
+      console.error("Error al cargar resultados desde Azure:", error);
+      setRecordsError("No se pudieron cargar los resultados desde Azure. Se muestra el respaldo local disponible.");
+
+      try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          setRecords(JSON.parse(raw));
+        } else {
+          setRecords([]);
+        }
+      } catch {
+        setRecords([]);
+      }
+    } finally {
+      setRecordsLoading(false);
+    }
+  }
+
+  function cacheRecordLocally(item) {
+    setRecords((previousRecords) => {
+      const updated = [item, ...previousRecords.filter((record) => record.id !== item.id)];
+
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      } catch {
+        // Si el navegador bloquea localStorage, Azure sigue conservando el registro principal.
+      }
+
+      return updated;
+    });
+  }
+
+  async function saveRecordIfNeeded() {
+    if (savedRecordId || savingRecord) return;
+
+    setSavingRecord(true);
+    setSaveError("");
+
+    const now = new Date();
+    const modulesReviewed = Object.values(reviewState).filter((item) => item.checked).length;
+    const localId = String(now.getTime());
+    const fullName = `${participant.nombre} ${participant.apellido}`.trim();
+
     const item = {
-      id: String(Date.now()),
-      date: new Date().toLocaleString("es-MX"),
+      id: localId,
+      fechaEnvio: now.toISOString(),
+      date: now.toLocaleString("es-MX"),
+      nombre: fullName,
       name: participant.nombre,
       apellido: participant.apellido,
+      correo: "",
+      entidad: participant.coordinacion,
+      unidad: "",
       coordinacion: participant.coordinacion,
       cargo: participant.cargo,
       diagnosticScore,
       diagnosticTotal: diagnosticQuestions.length,
-      reviewedTopics: Object.values(reviewState).filter((item) => item.checked).length,
+      modulesReviewed,
+      reviewedTopics: modulesReviewed,
       score: finalScore,
       totalQuestions: finalQuestions.length,
       percent: finalPercent
     };
-    const updated = [item, ...records];
-    setRecords(updated);
-    setSavedRecordId(item.id);
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+
+    try {
+      const response = await fetch(RESULTS_API_PATH, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(item)
+      });
+
+      if (!response.ok) {
+        throw new Error("No se pudo guardar el resultado en Azure.");
+      }
+
+      const result = await response.json();
+      const savedItem = { ...item, id: result.id || item.id };
+      cacheRecordLocally(savedItem);
+      setSavedRecordId(savedItem.id);
+    } catch (error) {
+      console.error("Error al guardar resultado en Azure:", error);
+      cacheRecordLocally(item);
+      setSavedRecordId(item.id);
+      setSaveError("El resultado se guardó localmente como respaldo, pero no pudo enviarse a Azure. Revisa la conexión antes del cierre del pilotaje.");
+    } finally {
+      setSavingRecord(false);
+    }
   }
 
   function goToNextTopic() {
@@ -1549,6 +1640,26 @@ export default function App() {
       <InstitutionalHeader />
 
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 20px" }}>
+        {screen !== "admin" && (
+          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 20 }} className="animate-content">
+            <button
+              onClick={() => setAdminOpen(true)}
+              style={{
+                background: "transparent",
+                border: 0,
+                color: COLORS.grisOscuro,
+                fontSize: 12,
+                fontWeight: 900,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                textDecoration: "underline",
+                cursor: "pointer"
+              }}
+            >
+              Acceso administrativo
+            </button>
+          </div>
+        )}
         
         {screen === "welcome" && (
           <div style={{ maxWidth: 800, margin: "0 auto", ...baseCardStyle({ padding: 40 }) }} className="animate-content">
@@ -1743,8 +1854,21 @@ export default function App() {
             <p style={{ fontSize: 18, marginTop: 30, color: COLORS.texto }}>
               Obtuviste {finalScore} de {finalQuestions.length} respuestas correctas.
             </p>
+            {saveError && (
+              <p style={{ fontSize: 13, marginTop: 20, color: COLORS.guinda, lineHeight: 1.6 }}>
+                {saveError}
+              </p>
+            )}
             <div style={{ marginTop: 40 }}>
-              <Button onClick={() => { saveRecordIfNeeded(); setScreen("closing"); }}>Continuar</Button>
+              <Button
+                disabled={savingRecord}
+                onClick={async () => {
+                  await saveRecordIfNeeded();
+                  setScreen("closing");
+                }}
+              >
+                {savingRecord ? "Guardando resultado..." : "Continuar"}
+              </Button>
             </div>
           </div>
         )}
@@ -1783,11 +1907,28 @@ export default function App() {
         )}
 
         {screen === "admin" && adminUnlocked && (
-          <div style={{ maxWidth: 1000, margin: "0 auto", ...baseCardStyle({ padding: 40 }) }} className="animate-content">
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
-              <h2 style={{ color: COLORS.guinda, fontSize: 28, fontWeight: 900, margin: 0 }}>Panel Administrativo</h2>
-              <Button variant="secondary" onClick={() => setScreen("welcome")}>Salir del Panel</Button>
+          <div style={{ maxWidth: 1100, margin: "0 auto", ...baseCardStyle({ padding: 40 }) }} className="animate-content">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 30 }}>
+              <div>
+                <h2 style={{ color: COLORS.guinda, fontSize: 28, fontWeight: 900, margin: 0 }}>Panel Administrativo</h2>
+                <p style={{ margin: "8px 0 0", fontSize: 13, color: COLORS.grisOscuro }}>
+                  Resultados consolidados desde Azure. Disponibles para consulta desde cualquier dispositivo.
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                <Button variant="secondary" onClick={() => loadRecordsFromServer()} disabled={recordsLoading}>
+                  {recordsLoading ? "Actualizando..." : "Actualizar"}
+                </Button>
+                <Button onClick={() => window.open(RESULTS_CSV_PATH, "_blank")}>Descargar CSV</Button>
+                <Button variant="secondary" onClick={() => setScreen("welcome")}>Salir del Panel</Button>
+              </div>
             </div>
+
+            {recordsError && (
+              <div style={{ marginBottom: 18, padding: 12, borderRadius: 8, background: COLORS.error, color: COLORS.guinda, fontSize: 13, lineHeight: 1.6 }}>
+                {recordsError}
+              </div>
+            )}
             
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14, textAlign: "left" }}>
@@ -1795,24 +1936,37 @@ export default function App() {
                   <tr style={{ background: COLORS.beige, color: COLORS.guinda }}>
                     <th style={{ padding: 12 }}>Fecha</th>
                     <th style={{ padding: 12 }}>Nombre</th>
+                    <th style={{ padding: 12 }}>Coordinación / Entidad</th>
                     <th style={{ padding: 12 }}>Cargo</th>
                     <th style={{ padding: 12 }}>Diagnóstico</th>
+                    <th style={{ padding: 12 }}>Módulos</th>
                     <th style={{ padding: 12 }}>Final</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {records.map((r, i) => (
-                    <tr key={i} style={{ borderBottom: `1px solid ${COLORS.gris}` }}>
-                      <td style={{ padding: 12 }}>{r.date}</td>
-                      <td style={{ padding: 12 }}>{r.name} {r.apellido}</td>
-                      <td style={{ padding: 12 }}>{r.cargo} - {r.coordinacion}</td>
-                      <td style={{ padding: 12 }}>{r.diagnosticScore}/{r.diagnosticTotal}</td>
-                      <td style={{ padding: 12 }}>{r.percent}%</td>
-                    </tr>
-                  ))}
+                  {records.map((r, i) => {
+                    const fecha = r.fechaEnvio ? new Date(r.fechaEnvio).toLocaleString("es-MX") : (r.date || "");
+                    const nombre = r.nombre || `${r.name || ""} ${r.apellido || ""}`.trim();
+                    const area = r.entidad || r.coordinacion || "";
+                    const modulesReviewed = r.modulesReviewed ?? r.reviewedTopics ?? "";
+
+                    return (
+                      <tr key={r.id || i} style={{ borderBottom: `1px solid ${COLORS.gris}` }}>
+                        <td style={{ padding: 12 }}>{fecha}</td>
+                        <td style={{ padding: 12 }}>{nombre || "Sin nombre"}</td>
+                        <td style={{ padding: 12 }}>{area || "No especificado"}</td>
+                        <td style={{ padding: 12 }}>{r.cargo || "No especificado"}</td>
+                        <td style={{ padding: 12 }}>{r.diagnosticScore}/{r.diagnosticTotal}</td>
+                        <td style={{ padding: 12 }}>{modulesReviewed}</td>
+                        <td style={{ padding: 12, fontWeight: 800 }}>{r.percent}%</td>
+                      </tr>
+                    );
+                  })}
                   {records.length === 0 && (
                     <tr>
-                      <td colSpan="5" style={{ padding: 20, textAlign: "center", color: COLORS.grisOscuro }}>No hay registros guardados aún.</td>
+                      <td colSpan="7" style={{ padding: 20, textAlign: "center", color: COLORS.grisOscuro }}>
+                        {recordsLoading ? "Cargando resultados..." : "No hay registros guardados aún."}
+                      </td>
                     </tr>
                   )}
                 </tbody>
